@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: translation-service-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - translation-service
+
+  webserver:
+    image: nginx:alpine
+    container_name: translation-service-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - translation-service
+
+  db:
+    image: mysql:8.0
+    container_name: translation-service-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: translation_service
+      MYSQL_ROOT_PASSWORD: Pass@123
+      MYSQL_PASSWORD: Pass@123
+      MYSQL_USER: translation_user
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
+      - dbdata:/var/lib/mysql/
+    networks:
+      - translation-service
+
+  redis:
+    image: redis:alpine
+    container_name: translation-service-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - translation-service
+
+networks:
+  translation-service:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local 

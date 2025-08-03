@@ -1,61 +1,342 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Translation Management Service
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A high-performance Laravel 11 API for managing translations across multiple locales with advanced search, filtering, and export capabilities.
 
-## About Laravel
+## 🎯 Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Multi-locale Support**: Store translations for multiple languages (`en`, `fr`, `es`, `de`, `it`, `pt`, `ru`, `ja`, `ko`, `zh`)
+- **Tagging System**: Organize translations by context (`mobile`, `desktop`, `web`, `admin`, etc.)
+- **Full CRUD Operations**: Create, read, update, delete translations with validation
+- **Advanced Search**: Search by keys, content, tags, locale, and namespace
+- **High-Performance Export**: JSON export for frontend apps with <500ms response time
+- **Token Authentication**: Secure API with Laravel Sanctum
+- **Caching**: Redis-based caching for optimal performance
+- **Docker Support**: Complete containerized development environment
+- **Comprehensive Testing**: >95% test coverage with performance tests
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Performance Targets
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Export Endpoint**: <500ms for 100k+ records
+- **All Other Endpoints**: <200ms response time
+- **Caching**: Redis-based caching for frequently accessed data
+- **Database Optimization**: Proper indexing and query optimization
 
-## Learning Laravel
+## 📋 Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP 8.2+
+- MySQL 8.0+
+- Redis 6.0+
+- Composer
+- Docker (optional)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🛠️ Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Using Docker (Recommended)
 
-## Laravel Sponsors
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd TranslationService
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+2. **Start the Docker containers**
+   ```bash
+   docker-compose up -d
+   ```
 
-### Premium Partners
+3. **Install dependencies**
+   ```bash
+   docker-compose exec app composer install
+   ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+4. **Set up environment**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your database credentials
+   ```
 
-## Contributing
+5. **Generate application key**
+   ```bash
+   docker-compose exec app php artisan key:generate
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+6. **Run migrations**
+   ```bash
+   docker-compose exec app php artisan migrate
+   ```
 
-## Code of Conduct
+7. **Generate test data (optional)**
+   ```bash
+   docker-compose exec app php artisan translations:generate 100000
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Manual Installation
 
-## Security Vulnerabilities
+1. **Install dependencies**
+   ```bash
+   composer install
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+2. **Set up environment**
+   ```bash
+   cp .env.example .env
+   # Configure database and Redis settings
+   ```
 
-## License
+3. **Generate application key**
+   ```bash
+   php artisan key:generate
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+4. **Run migrations**
+   ```bash
+   php artisan migrate
+   ```
+
+5. **Start the server**
+   ```bash
+   php artisan serve
+   ```
+
+## 📚 API Documentation
+
+### Authentication
+
+All protected endpoints require a Bearer token obtained through authentication.
+
+#### Register User
+```http
+POST /api/register
+Content-Type: application/json
+
+{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "password_confirmation": "password123"
+}
+```
+
+#### Login
+```http
+POST /api/login
+Content-Type: application/json
+
+{
+    "email": "john@example.com",
+    "password": "password123"
+}
+```
+
+### Translation Endpoints
+
+#### List Translations
+```http
+GET /api/translations?locale=en&namespace=general&search=welcome&tags=mobile,web&per_page=15
+Authorization: Bearer {token}
+```
+
+#### Create Translation
+```http
+POST /api/translations
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "key": "welcome.message",
+    "locale": "en",
+    "content": "Welcome to our application!",
+    "namespace": "general",
+    "is_active": true,
+    "tags": ["mobile", "web"],
+    "metadata": {
+        "author": "John Doe",
+        "version": "1.0"
+    }
+}
+```
+
+#### Update Translation
+```http
+PUT /api/translations/{id}
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "content": "Updated welcome message",
+    "is_active": false
+}
+```
+
+#### Delete Translation
+```http
+DELETE /api/translations/{id}
+Authorization: Bearer {token}
+```
+
+#### Export Translations
+```http
+GET /api/translations/export?locale=en&namespace=general&tags[]=mobile&tags[]=web
+Authorization: Bearer {token}
+```
+
+Response:
+```json
+{
+    "locale": "en",
+    "namespace": "general",
+    "translations": {
+        "welcome.message": "Welcome to our application!",
+        "button.save": "Save",
+        "button.cancel": "Cancel"
+    },
+    "count": 3,
+    "exported_at": "2024-01-15T10:30:00.000000Z"
+}
+```
+
+### Tag Endpoints
+
+#### List Tags
+```http
+GET /api/tags
+Authorization: Bearer {token}
+```
+
+## 🧪 Testing
+
+### Run All Tests
+```bash
+php artisan test
+```
+
+### Run Performance Tests
+```bash
+php artisan test --filter=PerformanceTest
+```
+
+### Generate Test Data
+```bash
+# Generate 100,000 translations for performance testing
+php artisan translations:generate 100000
+
+# Generate with custom batch size
+php artisan translations:generate 50000 --batch=500
+```
+
+## 🏗️ Architecture
+
+### Database Schema
+
+- **translations**: Core translation data with optimized indexes
+- **translation_tags**: Tag definitions
+- **translation_tag_pivot**: Many-to-many relationship table
+
+### Key Design Decisions
+
+1. **Caching Strategy**: Redis-based caching for export endpoints with 1-hour TTL
+2. **Database Optimization**: Composite indexes on frequently queried columns
+3. **Batch Processing**: Efficient data generation with configurable batch sizes
+4. **API Design**: RESTful endpoints with consistent JSON responses
+5. **Security**: Token-based authentication with Laravel Sanctum
+
+### Performance Optimizations
+
+- **Indexing**: Strategic database indexes for fast queries
+- **Caching**: Redis caching for expensive operations
+- **Pagination**: Efficient pagination for large datasets
+- **Query Optimization**: Optimized Eloquent queries with eager loading
+- **Batch Operations**: Efficient bulk operations for data generation
+
+## 🔧 Configuration
+
+### Environment Variables
+
+```env
+# Database
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=translation_service
+DB_USERNAME=root
+DB_PASSWORD=
+
+# Redis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+# Cache
+CACHE_DRIVER=redis
+
+# Translation Service Settings
+TRANSLATION_CACHE_TTL=3600
+TRANSLATION_EXPORT_LIMIT=100000
+TRANSLATION_PERFORMANCE_THRESHOLD=500
+```
+
+## 🐳 Docker Configuration
+
+The project includes a complete Docker setup with:
+
+- **PHP 8.2-FPM**: Application container
+- **Nginx**: Web server
+- **MySQL 8.0**: Database
+- **Redis**: Caching and session storage
+
+### Docker Commands
+
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Execute commands in app container
+docker-compose exec app php artisan migrate
+
+# Stop all services
+docker-compose down
+```
+
+## 📊 Monitoring & Performance
+
+### Performance Metrics
+
+- Export endpoint response time: <500ms
+- List/search endpoint response time: <200ms
+- Database query optimization
+- Cache hit rates
+
+### Monitoring
+
+- Application logs in `storage/logs/`
+- Database query logs
+- Performance test results
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+## 📄 License
+
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## 🆘 Support
+
+For support and questions:
+
+1. Check the API documentation above
+2. Review the test files for usage examples
+3. Run performance tests to verify your setup
+4. Check the logs for error details
+
+---
+
+**Note**: This is a demonstration project for senior-level Laravel development. It showcases clean architecture, performance optimization, comprehensive testing, and production-ready practices.
